@@ -1,5 +1,4 @@
 export function convertToDiscordMarkdown(richText) {
-  console.log("Starting conversion with input:", richText);
   
   let markdown = richText;
 
@@ -11,36 +10,54 @@ export function convertToDiscordMarkdown(richText) {
 
   // Convert headers based on font size and bold
   markdown = markdown.replace(/<(p|div|span)[^>]*style="[^"]*font-size:\s*(\d+)pt;[^"]*font-weight:\s*(?:bold|700)[^"]*"[^>]*>(.*?)<\/\1>/gi, (match, tag, fontSize, content) => {
-    const trimmedContent = content.trim();
+    const trimmedContent = content;
     if (parseInt(fontSize) > 16) {
       return `# ${trimmedContent}\n\n`;
     } else if (parseInt(fontSize) === 16) {
       return `## ${trimmedContent}\n\n`;
     }
-    return `**${trimmedContent}**\n\n`;
+    return `**${trimmedContent}**`;
+  });
+
+  // Convert links
+  markdown = markdown.replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, (match, url, text) => {
+    // Remove any HTML tags from the link text
+    const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
+    return `[${cleanText}](${url})`;
   });
 
   // Convert list items with proper nesting
   let listStack = [];
+  let listCounter = [0];
   markdown = markdown.replace(/<(ul|ol|li)[^>]*>|<\/(ul|ol|li)>/gi, (match, openTag, closeTag) => {
     if (openTag === 'ul' || openTag === 'ol') {
       listStack.push(openTag);
-      return '';
+      listCounter.push(0);
+      return '\n';
     } else if (closeTag === 'ul' || closeTag === 'ol') {
       listStack.pop();
-      return '';
+      listCounter.pop();
+      return '\n';
     } else if (openTag === 'li') {
-      const indent = ' '.repeat(Math.max(0, listStack.length - 1) * 2);
-      const nestedSpace = listStack.length > 1 ? '' : ''; // Add space for nested items
-      return `${indent}${nestedSpace}- `;
+      const indent = ' '.repeat(Math.max(0, listStack.length - 1) * 3);
+      const listType = listStack[listStack.length - 1];
+      let marker;
+      if (listType === 'ul') {
+        marker = '-';
+      } else {
+        listCounter[listCounter.length - 1]++;
+        const count = listCounter[listCounter.length - 1];
+        marker = listStack.length > 1 ? String.fromCharCode(96 + count) + '.' : count + '.';
+      }
+      return `\n${indent}${marker} `;
     } else if (closeTag === 'li') {
-      return '';
+      return '\n';
     }
     return '';
   });
 
   // Convert remaining paragraphs
-  markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n');
+  markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
 
   // Remove remaining HTML tags
   markdown = markdown.replace(/<[^>]+>/g, '');
@@ -51,15 +68,14 @@ export function convertToDiscordMarkdown(richText) {
   // Preserve all linebreaks
   markdown = markdown.replace(/\r\n|\r|\n/g, '\n');
 
+  // Remove extra spaces at the beginning of lines, but preserve indentation
+  markdown = markdown.replace(/^( {3,}| (?!-))/gm, match => match.length >= 3 ? match : '');
+
   // Ensure no extra newlines are added between list items
-  markdown = markdown.replace(/\n+(-\s)/g, '\n$1');
+  markdown = markdown.replace(/\n+([0-9]+\.|[a-z]\.|[-])/g, '\n$1');
 
-  // Add newline after labels followed by a list
-  markdown = markdown.replace(/^(.+:)\s*\n(- )/gm, '$1\n$2');
+  // Trim extra whitespace and newlines
+  markdown = markdown.replace(/\n{3,}/g, '\n\n').trim();
 
-  // Trim extra whitespace and newlines, but keep double newlines
-  markdown = markdown.replace(/\n{3,}/g, '\n').trim();
-
-  console.log("Final conversion output:", markdown);
   return markdown;
 }
