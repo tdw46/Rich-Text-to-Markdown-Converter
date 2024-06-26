@@ -1,0 +1,89 @@
+:root {
+  --background-color: #f0f2f5;
+  --button-color: #6773d1;
+  --button-text-color: #ffffff;
+  --title-color: #6773d1;
+  --shadow-color: rgba(163, 177, 198, 0.5);
+  --highlight-color: rgba(255, 255, 255, 0.5);
+}
+
+body {
+  background-color: var(--background-color);
+}
+
+.converter-container {
+  display: flex;
+  height: 100vh;
+  padding: 20px;
+  background-color: var(--background-color);
+  font-family: Arial, sans-serif;
+}
+
+.input-section,
+.output-section {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+  padding: 20px;
+}
+
+.column-heading {
+  font-size: 1.5rem;
+  color: var(--title-color);
+  margin-bottom: 15px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.editable-div,
+.output-pre {
+  flex-grow: 1;
+  margin-top: 10px;
+  padding: 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  overflow-y: auto;
+}
+
+.editable-div {
+  text-align: left;
+  background-color: var(--background-color);
+}
+
+.editable-div:empty:before {
+  content: attr(placeholder);
+  color: #888;
+}
+
+.output-pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.neumorphic {
+  background: var(--background-color);
+  box-shadow: 9px 9px 16px var(--shadow-color), -9px -9px 16px var(--highlight-color);
+}
+
+.neumorphic-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: var(--button-text-color);
+  background-color: var(--button-color);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 6px 6px 10px var(--shadow-color), -6px -6px 10px var(--highlight-color);
+  margin-bottom: 10px;
+}
+
+.neumorphic-button:hover {
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+.neumorphic-button:active {
+  box-shadow: inset 6px 6px 10px rgba(0, 0, 0, 0.1), inset -6px -6px 10px rgba(255, 255, 255, 0.1);
+}
