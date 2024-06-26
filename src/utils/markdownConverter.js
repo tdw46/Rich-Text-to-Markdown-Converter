@@ -75,7 +75,7 @@ export function convertToDiscordMarkdown(richText) {
   markdown = markdown.replace(/\n+([0-9]+\.|[a-z]\.|[-])/g, '\n$1');
 
   // Trim extra whitespace and newlines
-  markdown = markdown.replace(/\n{3,}/g, '\n\n').trim();
+  markdown = markdown.replace(/\n{3,}/g, '\n')
 
   return markdown;
 }
